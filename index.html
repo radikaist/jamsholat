@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Jam Sholat Digital - By Radika Istiawan</title>
+    <title>Jam Sholat Digital Pro - Full Custom</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Inter:wght@300;400;600&display=swap');
@@ -14,9 +14,7 @@
         @keyframes marquee { 0% { transform: translate(0, 0); } 100% { transform: translate(-100%, 0); } }
         .hidden { display: none !important; }
         .text-neon { text-shadow: 0 0 15px rgba(74, 222, 128, 0.4); }
-        /* Custom Scrollbar for Admin Panel */
         ::-webkit-scrollbar { width: 5px; }
-        ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
     </style>
 </head>
@@ -24,19 +22,19 @@
 
     <audio id="audioAdzan" preload="auto"></audio>
 
-    <div class="fixed top-4 right-4 flex gap-2 z-40 no-print">
+    <div class="fixed top-4 right-4 flex gap-2 z-40">
         <button onclick="toggleAdmin()" class="p-2 glass rounded-full opacity-20 hover:opacity-100 transition text-xs">⚙️ Settings</button>
         <button onclick="toggleFullscreen()" class="p-2 glass rounded-full opacity-20 hover:opacity-100 transition text-xs">🖥️ Fullscreen</button>
     </div>
 
     <div id="main-display" class="flex flex-col items-center justify-center h-full w-full flex-1 gap-4 md:gap-8">
         <div class="text-center">
-            <h1 id="nama-kota-display" class="text-lg md:text-xl uppercase tracking-[0.4em] text-slate-500 mb-2 font-semibold italic">Mencari Lokasi...</h1>
+            <h1 id="display-header" class="text-lg md:text-xl uppercase tracking-[0.4em] text-slate-500 mb-2 font-semibold italic">Mencari Lokasi...</h1>
             
             <div id="jam" class="text-6xl md:text-[11rem] font-digital font-bold text-green-400 text-neon leading-none">00:00:00</div>
             
             <div id="countdown-box" class="mt-4 px-5 py-1.5 glass rounded-full inline-block border-green-500/20">
-                <span id="countdown-label" class="text-slate-400 uppercase tracking-widest text-[10px] md:text-xs">Menunggu...</span>
+                <span id="display-countdown-label" class="text-slate-400 uppercase tracking-widest text-[10px] md:text-xs">Menunggu...</span>
                 <span id="countdown-timer" class="text-yellow-400 font-digital ml-2 text-base md:text-xl">--:--:--</span>
             </div>
 
@@ -46,66 +44,76 @@
             </div>
         </div>
 
-        <div id="jadwal-grid" class="grid grid-cols-4 lg:grid-cols-8 gap-2 md:gap-4 w-full max-w-7xl">
-            </div>
+        <div id="jadwal-grid" class="grid grid-cols-4 lg:grid-cols-8 gap-2 md:gap-4 w-full max-w-7xl"></div>
     </div>
 
     <div id="admin-panel" class="fixed inset-0 bg-slate-950/98 flex items-center justify-center hidden z-50 p-4">
-        <div class="glass p-6 md:p-10 rounded-3xl w-full max-w-xl border-green-500/30 overflow-y-auto max-h-[90vh]">
-            <div class="flex justify-between items-center mb-8">
-                <div>
-                    <h2 class="text-2xl font-bold text-green-400 leading-tight">Pengaturan Personal</h2>
-                    <p class="text-xs text-slate-500">Data disimpan lokal di browser Anda.</p>
-                </div>
+        <div class="glass p-6 md:p-10 rounded-3xl w-full max-w-2xl border-green-500/30 overflow-y-auto max-h-[95vh]">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold text-green-400">Pengaturan Tampilan</h2>
                 <button onclick="toggleAdmin()" class="text-slate-400 hover:text-white bg-slate-800 p-2 rounded-lg">Tutup</button>
             </div>
             
             <div class="space-y-6 text-left">
-                <div>
-                    <label class="text-xs text-slate-400 uppercase font-bold tracking-wider">📍 Pilih Kota / Kabupaten</label>
-                    <div class="flex gap-2 mt-2">
-                        <input type="text" id="search-city" placeholder="Ketik nama kota..." class="flex-1 p-3 rounded-xl bg-slate-900 border border-slate-700 outline-none focus:border-green-500 text-white transition">
-                        <button onclick="searchCity()" class="bg-blue-600 px-5 rounded-xl text-white font-bold hover:bg-blue-700">Cari</button>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="text-[10px] text-slate-400 uppercase font-bold tracking-wider">Nama Masjid / Judul Utama</label>
+                        <input type="text" id="input-header" class="w-full p-2.5 rounded-xl bg-slate-900 border border-slate-700 mt-1 outline-none focus:border-green-500">
                     </div>
-                    <div id="city-results" class="mt-3 space-y-1 max-h-40 overflow-y-auto pr-2"></div>
+                    <div>
+                        <label class="text-[10px] text-slate-400 uppercase font-bold tracking-wider">Awalan Countdown (Contoh: Menuju)</label>
+                        <input type="text" id="input-cd-label" class="w-full p-2.5 rounded-xl bg-slate-900 border border-slate-700 mt-1 outline-none focus:border-green-500">
+                    </div>
                 </div>
 
                 <div>
-                    <label class="text-xs text-slate-400 uppercase font-bold tracking-wider">📜 Running Text Anda</label>
-                    <textarea id="input-text" rows="2" placeholder="Tulis pengingat sholat atau pesan di sini..." class="w-full p-3 rounded-xl bg-slate-900 border border-slate-700 mt-2 outline-none text-white focus:border-green-500"></textarea>
+                    <label class="text-[10px] text-slate-400 uppercase font-bold tracking-wider">📍 Lokasi Jadwal Sholat</label>
+                    <div class="flex gap-2 mt-1">
+                        <input type="text" id="search-city" placeholder="Ketik kota..." class="flex-1 p-2.5 rounded-xl bg-slate-900 border border-slate-700 outline-none focus:border-green-500">
+                        <button onclick="searchCity()" class="bg-blue-600 px-4 rounded-xl text-xs font-bold">CARI</button>
+                    </div>
+                    <div id="city-results" class="mt-2 space-y-1 max-h-24 overflow-y-auto"></div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="text-[10px] text-slate-400 uppercase font-bold tracking-wider">Pesan Berjalan</label>
+                        <textarea id="input-text" rows="2" class="w-full p-2.5 rounded-xl bg-slate-900 border border-slate-700 mt-1 outline-none focus:border-green-500"></textarea>
+                    </div>
+                    <div>
+                        <label class="text-[10px] text-slate-400 uppercase font-bold tracking-wider">URL Audio Adzan</label>
+                        <input type="text" id="input-audio" class="w-full p-2.5 rounded-xl bg-slate-900 border border-slate-700 mt-1 outline-none focus:border-green-500">
+                    </div>
                 </div>
 
                 <div>
-                    <label class="text-xs text-slate-400 uppercase font-bold tracking-wider">🎵 URL Suara Adzan (.mp3)</label>
-                    <input type="text" id="input-audio" placeholder="https://domain.com/adzan.mp3" class="w-full p-3 rounded-xl bg-slate-900 border border-slate-700 mt-2 text-white outline-none focus:border-green-500">
+                    <label class="text-[10px] text-slate-400 uppercase font-bold tracking-wider">Label Waktu Sholat (Kustom Nama)</label>
+                    <div id="prayer-labels-inputs" class="grid grid-cols-2 md:grid-cols-4 gap-2 mt-2">
+                        </div>
                 </div>
 
-                <div class="pt-4">
-                    <button onclick="saveSettings()" class="w-full bg-green-600 hover:bg-green-700 p-4 rounded-2xl font-bold text-lg transition text-white shadow-lg shadow-green-900/20">
-                        Simpan Perubahan
-                    </button>
-                    <p class="text-center text-[10px] text-slate-600 mt-4 italic">Jam Sholat Digital Pro v2.5 | Radika Istiawan</p>
-                </div>
+                <button onclick="saveSettings()" class="w-full bg-green-600 hover:bg-green-700 p-4 rounded-2xl font-bold text-lg transition shadow-lg shadow-green-900/20">
+                    Simpan & Terapkan
+                </button>
             </div>
         </div>
     </div>
 
     <div id="footer-marquee" class="w-full glass py-3 absolute bottom-0 left-0 border-t border-white/5">
         <div class="overflow-hidden whitespace-nowrap">
-            <div id="running-text-display" class="marquee-content text-sm md:text-lg text-yellow-400 font-medium uppercase tracking-[0.2em]">
-                Memuat pesan personal...
-            </div>
+            <div id="running-text-display" class="marquee-content text-sm md:text-lg text-yellow-400 font-medium uppercase tracking-[0.2em]">Memuat...</div>
         </div>
     </div>
 
     <script>
-        // Default Kota Bekasi (1206) jika user belum pernah mensetting
         let currentCityId = localStorage.getItem('s_city_id') || '1206';
         let jadwalHariIni = {};
         let adzanPlayed = false;
+        
+        const prayerKeys = ['imsak', 'subuh', 'terbit', 'dhuha', 'dzuhur', 'ashar', 'maghrib', 'isya'];
+        const defaultLabels = { imsak:'Imsak', subuh:'Subuh', terbit:'Syuruq', dhuha:'Dhuha', dzuhur:'Dzuhur', ashar:'Ashar', maghrib:'Maghrib', isya:'Isya', cd:'Menuju' };
 
-        // 1. UPDATE JAM & LOGIKA HARIAN
-        function clockCycle() {
+        function updateClock() {
             const now = new Date();
             const h = String(now.getHours()).padStart(2, '0');
             const m = String(now.getMinutes()).padStart(2, '0');
@@ -120,48 +128,10 @@
             }
         }
 
-        // 2. AMBIL JADWAL DARI API
-        async function fetchJadwal() {
-            try {
-                const t = new Date();
-                const res = await fetch(`https://api.myquran.com/v2/sholat/jadwal/${currentCityId}/${t.getFullYear()}/${t.getMonth()+1}/${t.getDate()}`);
-                const resJson = await res.json();
-                jadwalHariIni = resJson.data.jadwal;
-                
-                document.getElementById('nama-kota-display').innerText = resJson.data.lokasi;
-
-                // Hitung Hijriah secara Lokal (Lebih stabil & anti-undefined)
-                try {
-                    const hijri = new Intl.DateTimeFormat('id-ID-u-ca-islamic-umalqura', {day:'numeric', month:'long', year:'numeric'}).format(t);
-                    document.getElementById('tanggal-hijriah').innerText = hijri + " H";
-                } catch(e) { document.getElementById('tanggal-hijriah').innerText = ""; }
-
-                renderGrid();
-            } catch (e) {
-                document.getElementById('nama-kota-display').innerText = "OFFLINE MODE";
-            }
-        }
-
-        function renderGrid() {
-            const keys = [
-                {k:'imsak', l:'Imsak'}, {k:'subuh', l:'Subuh'}, {k:'terbit', l:'Syuruq'}, {k:'dhuha', l:'Dhuha'},
-                {k:'dzuhur', l:'Dzuhur'}, {k:'ashar', l:'Ashar'}, {k:'maghrib', l:'Maghrib'}, {k:'isya', l:'Isya'}
-            ];
-            const container = document.getElementById('jadwal-grid');
-            container.innerHTML = '';
-            keys.forEach(item => {
-                container.innerHTML += `
-                    <div class="glass p-3 md:p-6 rounded-2xl text-center border-b-2 border-transparent hover:border-green-500 transition-all duration-300">
-                        <div class="text-slate-500 text-[9px] md:text-xs uppercase mb-1 font-bold tracking-widest">${item.l}</div>
-                        <div class="text-lg md:text-2xl font-bold font-digital text-white">${jadwalHariIni[item.k] || '--:--'}</div>
-                    </div>`;
-            });
-        }
-
-        // 3. COUNTDOWN & ADZAN
         function calcCountdown(now) {
             const list = ['subuh', 'dzuhur', 'ashar', 'maghrib', 'isya'];
             let next = null; let nextT = null;
+            const labels = JSON.parse(localStorage.getItem('s_labels')) || defaultLabels;
 
             for (let s of list) {
                 const tArr = jadwalHariIni[s].split(':');
@@ -170,20 +140,53 @@
                 if (pDate > now) { next = s; nextT = pDate; break; }
             }
 
-            const label = document.getElementById('countdown-label');
-            const timer = document.getElementById('countdown-timer');
+            const labelEl = document.getElementById('display-countdown-label');
+            const timerEl = document.getElementById('countdown-timer');
+            const cdPrefix = localStorage.getItem('s_cd_label') || labels.cd;
 
             if (next) {
                 const diff = nextT - now;
                 const hrs = Math.floor(diff / 3600000);
                 const mins = Math.floor((diff % 3600000) / 60000);
                 const secs = Math.floor((diff % 60000) / 1000);
-                label.innerText = `Menuju ${next}`;
-                timer.innerText = `${String(hrs).padStart(2, '0')}:${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+                labelEl.innerText = `${cdPrefix} ${labels[next] || next}`;
+                timerEl.innerText = `${String(hrs).padStart(2, '0')}:${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
             } else {
-                label.innerText = "Menuju Subuh Esok";
-                timer.innerText = "--:--:--";
+                labelEl.innerText = "Istirahat";
+                timerEl.innerText = "--:--:--";
             }
+        }
+
+        async function fetchJadwal() {
+            try {
+                const t = new Date();
+                const res = await fetch(`https://api.myquran.com/v2/sholat/jadwal/${currentCityId}/${t.getFullYear()}/${t.getMonth()+1}/${t.getDate()}`);
+                const data = await res.json();
+                jadwalHariIni = data.data.jadwal;
+                
+                const customHeader = localStorage.getItem('s_header');
+                document.getElementById('display-header').innerText = customHeader || data.data.lokasi;
+
+                try {
+                    const hijri = new Intl.DateTimeFormat('id-ID-u-ca-islamic-umalqura', {day:'numeric', month:'long', year:'numeric'}).format(t);
+                    document.getElementById('tanggal-hijriah').innerText = hijri + " H";
+                } catch(e) { document.getElementById('tanggal-hijriah').innerText = ""; }
+
+                renderGrid();
+            } catch (e) { document.getElementById('display-header').innerText = "OFFLINE"; }
+        }
+
+        function renderGrid() {
+            const container = document.getElementById('jadwal-grid');
+            const labels = JSON.parse(localStorage.getItem('s_labels')) || defaultLabels;
+            container.innerHTML = '';
+            prayerKeys.forEach(k => {
+                container.innerHTML += `
+                    <div class="glass p-3 md:p-6 rounded-2xl text-center border-b-2 border-transparent hover:border-green-500 transition-all duration-300">
+                        <div class="text-slate-500 text-[9px] md:text-xs uppercase mb-1 font-bold tracking-widest">${labels[k] || k}</div>
+                        <div class="text-lg md:text-2xl font-bold font-digital text-white">${jadwalHariIni[k] || '--:--'}</div>
+                    </div>`;
+            });
         }
 
         function triggerAdzan(hm) {
@@ -191,14 +194,13 @@
             wajib.forEach(sName => {
                 if (jadwalHariIni[sName] === hm && !adzanPlayed) {
                     const audio = document.getElementById('audioAdzan');
-                    if(audio.src) audio.play().catch(e => console.log("Klik layar untuk aktifkan suara"));
+                    if(audio.src) audio.play().catch(e => console.log("Izin audio"));
                     adzanPlayed = true;
                 }
             });
             if (new Date().getSeconds() === 0) adzanPlayed = false;
         }
 
-        // 4. ADMIN & SEARCH (LOCALSTORAGE LOGIC)
         async function searchCity() {
             const q = document.getElementById('search-city').value;
             if(q.length < 3) return;
@@ -207,16 +209,14 @@
             const resDiv = document.getElementById('city-results');
             resDiv.innerHTML = '';
             data.data.forEach(item => {
-                resDiv.innerHTML += `
-                    <button onclick="selectCity('${item.id}', '${item.lokasi}')" class="w-full text-left p-3 bg-slate-800 hover:bg-green-700 rounded-xl text-xs mb-1 text-white transition">
-                        ${item.lokasi}
-                    </button>`;
+                resDiv.innerHTML += `<button onclick="selectCity('${item.id}', '${item.lokasi}')" class="w-full text-left p-2 bg-slate-800 hover:bg-green-700 rounded-lg text-xs mb-1">${item.lokasi}</button>`;
             });
         }
 
         function selectCity(id, nama) {
             currentCityId = id;
             localStorage.setItem('s_city_id', id);
+            localStorage.removeItem('s_header'); // Reset header kustom jika ganti kota
             saveSettings();
         }
 
@@ -224,22 +224,44 @@
             const panel = document.getElementById('admin-panel');
             panel.classList.toggle('hidden');
             if(!panel.classList.contains('hidden')) {
-                document.getElementById('input-text').value = localStorage.getItem('s_text') || "Selamat Menjalankan Ibadah Sholat - jamsholat.radika.id";
+                document.getElementById('input-header').value = localStorage.getItem('s_header') || "";
+                document.getElementById('input-text').value = localStorage.getItem('s_text') || "Selamat Menjalankan Ibadah Sholat";
                 document.getElementById('input-audio').value = localStorage.getItem('s_audio') || "https://www.islamcan.com/audio/adzan/azan1.mp3";
+                document.getElementById('input-cd-label').value = localStorage.getItem('s_cd_label') || "Menuju";
+                
+                const labelInputs = document.getElementById('prayer-labels-inputs');
+                const savedLabels = JSON.parse(localStorage.getItem('s_labels')) || defaultLabels;
+                labelInputs.innerHTML = '';
+                prayerKeys.forEach(k => {
+                    labelInputs.innerHTML += `
+                        <div>
+                            <label class="text-[9px] text-slate-500 uppercase">${k}</label>
+                            <input type="text" data-key="${k}" value="${savedLabels[k] || defaultLabels[k]}" class="w-full p-1.5 text-xs bg-slate-900 border border-slate-800 rounded outline-none focus:border-green-500 text-white">
+                        </div>`;
+                });
             }
         }
 
         function saveSettings() {
+            localStorage.setItem('s_header', document.getElementById('input-header').value);
             localStorage.setItem('s_text', document.getElementById('input-text').value);
             localStorage.setItem('s_audio', document.getElementById('input-audio').value);
+            localStorage.setItem('s_cd_label', document.getElementById('input-cd-label').value);
             localStorage.setItem('s_city_id', currentCityId);
+
+            const labels = {};
+            document.querySelectorAll('#prayer-labels-inputs input').forEach(input => {
+                labels[input.dataset.key] = input.value;
+            });
+            localStorage.setItem('s_labels', JSON.stringify(labels));
+            
             applySettings();
             fetchJadwal();
             if(!document.getElementById('admin-panel').classList.contains('hidden')) toggleAdmin();
         }
 
         function applySettings() {
-            document.getElementById('running-text-display').innerText = localStorage.getItem('s_text') || "Selamat Menjalankan Ibadah Sholat - jamsholat.radika.id";
+            document.getElementById('running-text-display').innerText = localStorage.getItem('s_text') || "Selamat Menjalankan Ibadah Sholat";
             const aud = document.getElementById('audioAdzan');
             const savedAud = localStorage.getItem('s_audio');
             if(savedAud) aud.src = savedAud;
@@ -250,11 +272,9 @@
             else document.exitFullscreen();
         }
 
-        // INIT APP
-        setInterval(clockCycle, 1000);
+        setInterval(updateClock, 1000);
         applySettings();
         fetchJadwal();
-        // Refresh jadwal tiap jam
         setInterval(fetchJadwal, 3600000);
     </script>
 </body>
