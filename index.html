@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Jam Sholat Digital Pro - Full Features</title>
+    <title>Jam Sholat Digital Pro - Fixed Hijri</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Inter:wght@300;400;600&display=swap');
@@ -28,22 +28,17 @@
     <div id="main-display" class="flex flex-col items-center justify-center h-full w-full flex-1 gap-6">
         <div class="text-center">
             <h1 id="nama-kota-display" class="text-xl uppercase tracking-[0.4em] text-slate-500 mb-2 font-semibold italic">Memuat...</h1>
-            
             <div id="jam" class="text-7xl md:text-[10rem] font-digital font-bold text-green-400 text-neon">00:00:00</div>
-            
             <div id="countdown-box" class="mt-4 px-6 py-2 glass rounded-full inline-block border-green-500/20">
                 <span id="countdown-label" class="text-slate-400 uppercase tracking-widest text-xs">Mencari Jadwal...</span>
                 <span id="countdown-timer" class="text-yellow-400 font-digital ml-2 text-lg">--:--:--</span>
             </div>
-
             <div class="mt-6">
                 <p id="tanggal-masehi" class="text-xl md:text-2xl text-slate-300 font-light"></p>
                 <p id="tanggal-hijriah" class="text-lg md:text-xl text-yellow-500/80 font-medium tracking-wide mt-1"></p>
             </div>
         </div>
-
-        <div id="jadwal-grid" class="grid grid-cols-4 lg:grid-cols-8 gap-3 w-full max-w-7xl">
-            </div>
+        <div id="jadwal-grid" class="grid grid-cols-4 lg:grid-cols-8 gap-3 w-full max-w-7xl"></div>
     </div>
 
     <div id="admin-panel" class="fixed inset-0 bg-slate-950/98 flex items-center justify-center hidden z-50 p-4">
@@ -52,7 +47,6 @@
                 <h2 class="text-2xl font-bold text-green-400">⚙️ Pengaturan</h2>
                 <button onclick="toggleAdmin()" class="text-slate-400 hover:text-white">Tutup [X]</button>
             </div>
-            
             <div class="space-y-6">
                 <div>
                     <label class="text-xs text-slate-400 uppercase font-bold">📍 Cari Kota</label>
@@ -62,17 +56,14 @@
                     </div>
                     <div id="city-results" class="mt-2 space-y-1 max-h-32 overflow-y-auto text-white"></div>
                 </div>
-
                 <div>
                     <label class="text-xs text-slate-400 uppercase font-bold">📜 Pesan Running Text</label>
                     <textarea id="input-text" rows="2" class="w-full p-3 rounded-xl bg-slate-800 border border-slate-700 mt-1 outline-none text-white"></textarea>
                 </div>
-
                 <div>
                     <label class="text-xs text-slate-400 uppercase font-bold">🎵 URL Audio Adzan</label>
                     <input type="text" id="input-audio" class="w-full p-3 rounded-xl bg-slate-800 border border-slate-700 mt-1 text-white">
                 </div>
-
                 <button onclick="saveSettings()" class="w-full bg-green-600 hover:bg-green-700 p-4 rounded-xl font-bold text-lg transition text-white">Simpan Perubahan</button>
             </div>
         </div>
@@ -80,9 +71,7 @@
 
     <div id="footer-marquee" class="w-full glass py-4 absolute bottom-0 left-0">
         <div class="overflow-hidden whitespace-nowrap">
-            <div id="running-text-display" class="marquee-content text-xl text-yellow-400 font-semibold uppercase tracking-widest">
-                Memuat pesan...
-            </div>
+            <div id="running-text-display" class="marquee-content text-xl text-yellow-400 font-semibold uppercase tracking-widest">Memuat pesan...</div>
         </div>
     </div>
 
@@ -159,8 +148,13 @@
                 const result = await res.json();
                 jadwalHariIni = result.data.jadwal;
                 
-                // Menampilkan Tanggal Hijriah dari API
-                document.getElementById('tanggal-hijriah').innerText = result.data.date;
+                // Gunakan Intl.DateTimeFormat agar tidak undefined
+                const hijriFormatter = new Intl.DateTimeFormat('id-ID-u-ca-islamic-umalqura-nu-latn', {
+                    day: 'numeric',
+                    month: 'long',
+                    year: 'numeric'
+                });
+                document.getElementById('tanggal-hijriah').innerText = hijriFormatter.format(t);
                 document.getElementById('nama-kota-display').innerText = result.data.lokasi;
                 renderJadwal();
             } catch (e) {
@@ -190,7 +184,6 @@
             });
         }
 
-        // ADMIN FUNCTIONS
         async function searchCity() {
             const query = document.getElementById('search-city').value;
             if(query.length < 3) return;
@@ -212,7 +205,7 @@
             const panel = document.getElementById('admin-panel');
             panel.classList.toggle('hidden');
             if(!panel.classList.contains('hidden')) {
-                document.getElementById('input-text').value = localStorage.getItem('s_text') || "Jagalah sholatmu, maka Allah akan menjaga hidupmu";
+                document.getElementById('input-text').value = localStorage.getItem('s_text') || "Selamat Menjalankan Ibadah Sholat";
                 document.getElementById('input-audio').value = localStorage.getItem('s_audio') || "https://www.islamcan.com/audio/adzan/azan1.mp3";
             }
         }
@@ -227,7 +220,7 @@
         }
 
         function applySettings() {
-            document.getElementById('running-text-display').innerText = localStorage.getItem('s_text') || "Jagalah sholatmu, maka Allah akan menjaga hidupmu";
+            document.getElementById('running-text-display').innerText = localStorage.getItem('s_text') || "Selamat Menjalankan Ibadah Sholat";
             document.getElementById('audioAdzan').src = localStorage.getItem('s_audio') || "https://www.islamcan.com/audio/adzan/azan1.mp3";
         }
 
