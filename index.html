@@ -3,34 +3,31 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Jam Sholat Digital - All In One</title>
+    <title>Jam Sholat Digital Pro - Lokasi Dinamis</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Inter:wght@400;600&display=swap');
         .font-digital { font-family: 'Orbitron', sans-serif; }
         body { font-family: 'Inter', sans-serif; background-color: #020617; color: white; overflow: hidden; }
         .glass { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1); }
-        
-        /* Animasi Running Text */
         .marquee-content { display: inline-block; padding-left: 100%; animation: marquee 25s linear infinite; }
         @keyframes marquee { 0% { transform: translate(0, 0); } 100% { transform: translate(-100%, 0); } }
-        
-        /* Hidden Class */
         .hidden { display: none; }
+        input, textarea { color: white; }
     </style>
 </head>
 <body class="min-h-screen flex flex-col items-center justify-between p-6">
 
     <audio id="audioAdzan" preload="auto"></audio>
 
-    <div class="fixed top-4 right-4 flex gap-2 no-print">
-        <button onclick="toggleAdmin()" class="p-2 glass rounded-full opacity-30 hover:opacity-100 transition">⚙️ Admin</button>
-        <button onclick="toggleFullscreen()" class="p-2 glass rounded-full opacity-30 hover:opacity-100 transition">🖥️ Fullscreen</button>
+    <div class="fixed top-4 right-4 flex gap-2 no-print z-40">
+        <button onclick="toggleAdmin()" class="p-2 glass rounded-full opacity-30 hover:opacity-100 transition">⚙️ Pengaturan</button>
+        <button onclick="toggleFullscreen()" class="p-2 glass rounded-full opacity-30 hover:opacity-100 transition">🖥️ Layar Penuh</button>
     </div>
 
     <div id="main-display" class="flex flex-col items-center justify-between h-full w-full py-10">
         <div class="text-center">
-            <h1 id="nama-kota" class="text-2xl uppercase tracking-[0.4em] text-slate-500 mb-2 font-semibold">Memuat Data...</h1>
+            <h1 id="nama-kota-display" class="text-2xl uppercase tracking-[0.4em] text-slate-500 mb-2 font-semibold italic">Memuat Lokasi...</h1>
             <div id="jam" class="text-8xl md:text-[11rem] font-digital font-bold text-green-400 drop-shadow-[0_0_20px_rgba(74,222,128,0.3)]">00:00:00</div>
             <p id="tanggal" class="text-2xl mt-4 text-slate-400 font-light"></p>
         </div>
@@ -39,23 +36,35 @@
             </div>
     </div>
 
-    <div id="admin-panel" class="fixed inset-0 bg-slate-900/95 flex items-center justify-center hidden z-50">
-        <div class="glass p-8 rounded-3xl w-full max-w-lg border-green-500/30">
-            <h2 class="text-2xl font-bold mb-6 text-green-400 flex justify-between">
-                Pengaturan Admin
-                <button onclick="toggleAdmin()" class="text-slate-400 text-sm">Tutup [X]</button>
-            </h2>
+    <div id="admin-panel" class="fixed inset-0 bg-slate-950/98 flex items-center justify-center hidden z-50 p-4">
+        <div class="glass p-8 rounded-3xl w-full max-w-xl border-green-500/30 overflow-y-auto max-h-[90vh]">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold text-green-400">⚙️ Pengaturan Sistem</h2>
+                <button onclick="toggleAdmin()" class="text-slate-400 hover:text-white">Tutup [X]</button>
+            </div>
             
-            <div class="space-y-4">
+            <div class="space-y-6">
                 <div>
-                    <label class="text-xs text-slate-400 uppercase">Pesan Running Text</label>
-                    <textarea id="input-text" rows="3" class="w-full p-3 rounded-xl bg-slate-800 border border-slate-700 mt-1"></textarea>
+                    <label class="text-xs text-slate-400 uppercase font-bold">📍 Lokasi (Cari Kota)</label>
+                    <div class="flex gap-2 mt-1">
+                        <input type="text" id="search-city" placeholder="Ketik nama kota..." class="flex-1 p-3 rounded-xl bg-slate-800 border border-slate-700">
+                        <button onclick="searchCity()" class="bg-blue-600 px-4 rounded-xl hover:bg-blue-700 transition">Cari</button>
+                    </div>
+                    <div id="city-results" class="mt-2 space-y-1 max-h-32 overflow-y-auto"></div>
+                    <p id="current-city-id" class="text-[10px] text-green-500 mt-1 uppercase tracking-wider font-semibold"></p>
                 </div>
+
                 <div>
-                    <label class="text-xs text-slate-400 uppercase">Link Suara Adzan (.mp3)</label>
+                    <label class="text-xs text-slate-400 uppercase font-bold">📜 Pesan Berjalan</label>
+                    <textarea id="input-text" rows="2" class="w-full p-3 rounded-xl bg-slate-800 border border-slate-700 mt-1"></textarea>
+                </div>
+
+                <div>
+                    <label class="text-xs text-slate-400 uppercase font-bold">🎵 Link Suara Adzan (.mp3)</label>
                     <input type="text" id="input-audio" class="w-full p-3 rounded-xl bg-slate-800 border border-slate-700 mt-1">
                 </div>
-                <button onclick="saveSettings()" class="w-full bg-green-600 hover:bg-green-700 p-4 rounded-xl font-bold transition mt-4">Simpan & Terapkan</button>
+
+                <button onclick="saveSettings()" class="w-full bg-green-600 hover:bg-green-700 p-4 rounded-xl font-bold text-lg shadow-lg shadow-green-900/20 transition">Simpan Perubahan</button>
             </div>
         </div>
     </div>
@@ -63,52 +72,49 @@
     <div id="footer-marquee" class="w-full glass py-4 absolute bottom-0 left-0">
         <div class="overflow-hidden whitespace-nowrap">
             <div id="running-text-display" class="marquee-content text-xl text-yellow-400 font-semibold uppercase tracking-widest">
-                Selamat Datang di Aplikasi Jam Sholat Cikarang - Klik Admin untuk mengubah pesan ini.
+                Memuat pesan...
             </div>
         </div>
     </div>
 
     <script>
-        const KOTA_ID = '1206'; // Bekasi Regency (Cikarang)
+        // Data Default jika Memory Kosong
+        let currentCityId = localStorage.getItem('s_city_id') || '1206'; // Default Cikarang
         let jadwalHariIni = {};
         let adzanPlayed = false;
 
-        // 1. LOGIKA JAM & ADZAN
-        function updateAll() {
+        // 1. FUNGSI JAM & CEK ADZAN
+        function updateClock() {
             const now = new Date();
             const h = String(now.getHours()).padStart(2, '0');
             const m = String(now.getMinutes()).padStart(2, '0');
             const s = String(now.getSeconds()).padStart(2, '0');
-            const currentTime = `${h}:${m}`;
+            const timeNow = `${h}:${m}`;
             
             document.getElementById('jam').innerText = `${h}:${m}:${s}`;
             document.getElementById('tanggal').innerText = now.toLocaleDateString('id-ID', {weekday:'long', day:'numeric', month:'long', year:'numeric'});
 
-            // Cek Waktu Sholat untuk Bunyi Adzan
             const sholatTime = ['subuh', 'dzuhur', 'ashar', 'maghrib', 'isya'];
             sholatTime.forEach(sName => {
-                if (jadwalHariIni[sName] === currentTime && !adzanPlayed) {
-                    const audio = document.getElementById('audioAdzan');
-                    audio.play().catch(e => console.log("Perlu klik layar dulu agar suara aktif."));
+                if (jadwalHariIni[sName] === timeNow && !adzanPlayed) {
+                    document.getElementById('audioAdzan').play().catch(e => console.log("Audio dilarang browser"));
                     adzanPlayed = true;
                 }
             });
-
-            // Reset status adzan setiap menit baru
             if (s === "00") adzanPlayed = false;
         }
 
-        // 2. AMBIL DATA JADWAL (API)
+        // 2. FUNGSI AMBIL JADWAL DARI API
         async function fetchJadwal() {
             try {
                 const t = new Date();
-                const res = await fetch(`https://api.myquran.com/v2/sholat/jadwal/${KOTA_ID}/${t.getFullYear()}/${t.getMonth()+1}/${t.getDate()}`);
+                const res = await fetch(`https://api.myquran.com/v2/sholat/jadwal/${currentCityId}/${t.getFullYear()}/${t.getMonth()+1}/${t.getDate()}`);
                 const result = await res.json();
                 jadwalHariIni = result.data.jadwal;
-                document.getElementById('nama-kota').innerText = result.data.lokasi;
+                document.getElementById('nama-kota-display').innerText = result.data.lokasi;
                 renderJadwal();
             } catch (e) {
-                document.getElementById('nama-kota').innerText = "Koneksi Offline";
+                document.getElementById('nama-kota-display').innerText = "Koneksi Terputus";
             }
         }
 
@@ -118,41 +124,62 @@
             container.innerHTML = '';
             list.forEach(key => {
                 container.innerHTML += `
-                    <div class="glass p-6 rounded-2xl text-center">
-                        <div class="text-slate-500 text-xs uppercase mb-1">${key}</div>
+                    <div class="glass p-6 rounded-2xl text-center border-b-4 border-transparent hover:border-green-500 transition-all duration-500">
+                        <div class="text-slate-500 text-xs uppercase mb-1 font-bold">${key}</div>
                         <div class="text-3xl font-bold font-digital text-white">${jadwalHariIni[key]}</div>
                     </div>`;
             });
         }
 
-        // 3. LOGIKA ADMIN & SETTING
+        // 3. FUNGSI ADMIN: CARI KOTA
+        async function searchCity() {
+            const query = document.getElementById('search-city').value;
+            if(query.length < 3) return alert("Ketik minimal 3 huruf");
+            
+            const res = await fetch(`https://api.myquran.com/v2/sholat/kota/cari/${query}`);
+            const result = await res.json();
+            const list = result.data;
+            
+            const resultDiv = document.getElementById('city-results');
+            resultDiv.innerHTML = '';
+            list.forEach(item => {
+                resultDiv.innerHTML += `
+                    <button onclick="selectCity('${item.id}', '${item.lokasi}')" class="w-full text-left p-2 bg-slate-800 hover:bg-green-700 rounded text-sm mb-1 transition">
+                        ${item.lokasi} (ID: ${item.id})
+                    </button>`;
+            });
+        }
+
+        function selectCity(id, nama) {
+            currentCityId = id;
+            document.getElementById('current-city-id').innerText = "Terpilih: " + nama;
+            document.getElementById('city-results').innerHTML = '';
+        }
+
+        // 4. SIMPAN & TERAPKAN
         function toggleAdmin() {
             const panel = document.getElementById('admin-panel');
             panel.classList.toggle('hidden');
-            
-            // Isi input dengan data yang ada
-            document.getElementById('input-text').value = localStorage.getItem('s_text') || "Selamat Datang di Masjid Kami";
-            document.getElementById('input-audio').value = localStorage.getItem('s_audio') || "https://www.islamcan.com/audio/adzan/azan1.mp3";
+            if(!panel.classList.contains('hidden')) {
+                document.getElementById('input-text').value = localStorage.getItem('s_text') || "Selamat Menjalankan Ibadah Sholat";
+                document.getElementById('input-audio').value = localStorage.getItem('s_audio') || "https://www.islamcan.com/audio/adzan/azan1.mp3";
+                document.getElementById('current-city-id').innerText = "ID Kota Aktif: " + currentCityId;
+            }
         }
 
         function saveSettings() {
-            const txt = document.getElementById('input-text').value;
-            const aud = document.getElementById('input-audio').value;
-            
-            localStorage.setItem('s_text', txt);
-            localStorage.setItem('s_audio', aud);
+            localStorage.setItem('s_text', document.getElementById('input-text').value);
+            localStorage.setItem('s_audio', document.getElementById('input-audio').value);
+            localStorage.setItem('s_city_id', currentCityId);
             
             applySettings();
+            fetchJadwal();
             toggleAdmin();
-            alert("Pengaturan Disimpan!");
         }
 
         function applySettings() {
-            const savedText = localStorage.getItem('s_text');
-            const savedAudio = localStorage.getItem('s_audio');
-            
-            if(savedText) document.getElementById('running-text-display').innerText = savedText;
-            if(savedAudio) document.getElementById('audioAdzan').src = savedAudio;
+            document.getElementById('running-text-display').innerText = localStorage.getItem('s_text') || "Selamat Menjalankan Ibadah Sholat";
+            document.getElementById('audioAdzan').src = localStorage.getItem('s_audio') || "https://www.islamcan.com/audio/adzan/azan1.mp3";
         }
 
         function toggleFullscreen() {
@@ -160,11 +187,10 @@
             else document.exitFullscreen();
         }
 
-        // JALANKAN APLIKASI
-        setInterval(updateAll, 1000);
-        fetchJadwal();
+        // START
+        setInterval(updateClock, 1000);
         applySettings();
-        setInterval(fetchJadwal, 3600000); // Update jadwal tiap jam
+        fetchJadwal();
     </script>
 </body>
 </html>
